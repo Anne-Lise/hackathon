@@ -14,25 +14,6 @@ import {
 } from "@chatscope/chat-ui-kit-react";
 import { compileFunction } from "vm";
 
-export const openai = new OpenAI({
-  apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
-// const assistant = await openai.beta.assistants.create({
-//     instructions: "Translate all English into Japanese, and all Japanese into English.",
-//     model: "gpt-3.5-turbo-1106",
-// })
-//
-// const thread = await openai.beta.threads.create()
-
-// async function waitUntilRunComplete(run: OpenAI.Beta.Threads.Runs.Run): Promise<OpenAI.Beta.Threads.Runs.Run> {
-//     // poll run status until it is completed
-//     while (run.status !== "completed") {
-//         await new Promise((resolve) => setTimeout(resolve, 1000));
-//         run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-//     }
-//     return run
-// }
 const personaInput = {
   personName: "Tanaka",
   averageAge: 21,
@@ -49,6 +30,12 @@ const surveyTemplate = {
 };
 const surveyResults = { answers: ["Red", "Red", "Blue"] };
 
+
+export const openai = new OpenAI({
+  apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
+
 function App() {
   const [personaOutput, setPersonaOutput] = useState(
     JSON.stringify(personaInput),
@@ -60,25 +47,64 @@ function App() {
     if (updatePersona) {
       console.log("call to openai");
 
-      // const completion = async () => {
-      //   const response = await openai.chat.completions.create({
-      //     messages: [
-      //       {
-      //         role: "system",
-      //         content: `Here is a persona definition: "${JSON.stringify(
-      //           personaInput,
-      //         )}". ${promptInput}`,
-      //       },
-      //     ],
-      //     // messages: [{ role: "system", content: `You are a persona assistant. Based on the question and possible answers like ${surveyTemplate}, and result answers ${surveyResults},update the persona profile ${personaInput}` }],
-      //     model: "gpt-3.5-turbo-0613",
-      //   });
-      //   console.log(response.choices[0].message.content);
-      //   if (response && response.choices[0].message.content) {
-      //     setPersonaOutput(response.choices[0].message.content);
-      //   }
-      // };
-      // completion();
+      const assistantWrapper = async () => {
+        const assistant = await openai.beta.assistants.create({
+          instructions: `
+You are a persona assistant.
+
+Based on these survey results:
+    Here is the survey template :
+        Question: "what is your favorite animal?"
+        Possible answers: cat, dog, mouse
+    Here are the survey answers : [cat, cat, mouse]
+
+Could you please update the persona definition that follows?
+`
+,
+          model: "gpt-3.5-turbo-1106",
+        })
+
+        // Here is a persona definition: "${JSON.stringify(personaInput)}".
+        const thread = await openai.beta.threads.create()
+
+        const message = await openai.beta.threads.messages.create(
+          thread.id,
+          {
+            role: "user",
+            content: `Here is the persona definition: "${JSON.stringify(personaInput)}".`,
+          }
+        )
+
+        let run = await openai.beta.threads.runs.create(
+          thread.id,
+          {
+            assistant_id: assistant.id,
+          }
+        )
+
+        // poll run status until it is completed
+        while (run.status !== "completed") {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+        }
+
+        let messages = await openai.beta.threads.messages.list(thread.id);
+        console.log(messages.data.length)
+        console.log(messages.data[0].content[0])
+
+        return null
+      }
+
+      //text: Object { value: "It seems like you have provided a persona
+      //definition for a person named Tanaka. This persona indicates that
+      //Tanaka is 21 years old, primarily speaks English and Japanese, and has
+      //occupations as a student and a part-time cook. The persona also
+      //indicates that Tanaka's gender distribution is 23% male and 77% female,
+      //and that they are single.\n\nIf you have any specific questions or if
+      //there's anything else you'd like to know about this persona, feel free
+      //to ask!", annotations: [] }
+      assistantWrapper();
+
     }
   }, [updatePersona]);
 
