@@ -60,25 +60,25 @@ function App() {
     if (updatePersona) {
       console.log("call to openai");
 
-      // const completion = async () => {
-      //   const response = await openai.chat.completions.create({
-      //     messages: [
-      //       {
-      //         role: "system",
-      //         content: `Here is a persona definition: "${JSON.stringify(
-      //           personaInput,
-      //         )}". ${promptInput}`,
-      //       },
-      //     ],
-      //     // messages: [{ role: "system", content: `You are a persona assistant. Based on the question and possible answers like ${surveyTemplate}, and result answers ${surveyResults},update the persona profile ${personaInput}` }],
-      //     model: "gpt-3.5-turbo-0613",
-      //   });
-      //   console.log(response.choices[0].message.content);
-      //   if (response && response.choices[0].message.content) {
-      //     setPersonaOutput(response.choices[0].message.content);
-      //   }
-      // };
-      // completion();
+      const completion = async () => {
+        const response = await openai.chat.completions.create({
+          messages: [
+            {
+              role: "system",
+              content: `Here is a persona definition: "${JSON.stringify(
+                personaInput,
+              )}". ${promptInput}`,
+            },
+          ],
+          // messages: [{ role: "system", content: `You are a persona assistant. Based on the question and possible answers like ${surveyTemplate}, and result answers ${surveyResults},update the persona profile ${personaInput}` }],
+          model: "gpt-3.5-turbo-0613",
+        });
+        console.log(response.choices[0].message.content);
+        if (response && response.choices[0].message.content) {
+          setPersonaOutput(response.choices[0].message.content);
+        }
+      };
+      completion();
     }
   }, [updatePersona]);
 
