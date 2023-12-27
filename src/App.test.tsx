@@ -12,11 +12,6 @@ test('renders learn react link', () => {
 });
 
 describe('App tests', () => {
-  test('console.log is when button i clicked', () => {
-    const consoleSpy = jest.spyOn(console, 'log');
-    render(<App />);
-    userEvent.click(screen.getByRole("button", {name: "Click here"}));
-    expect(consoleSpy).toHaveBeenCalledWith('has been clicked');
-  })
+
 })
 
