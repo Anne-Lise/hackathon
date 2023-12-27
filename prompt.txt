@@ -1,0 +1,16 @@
+Here is current persona info :
+    Persona name: Tanaka
+    Average age: 21
+    Gender: 23% male, 77% female
+    Average income: 100000 JPY
+    Main languages: English, Japanese
+    Main occupations: Student, Part-time cook
+    Marital status: Single
+    Favorite products: Hooded down jacket, Polyester serge 6panel cap
+    Active in: Sale season, seasonal change
+Here is the survey template :
+    Question: "what is your favorite animal?"
+    Possible answers: cat, dog, mouse
+Here are the survey answers : [cat, cat, mouse]
+
+Given these parameters, please update the persona by analyzing the survey results.
