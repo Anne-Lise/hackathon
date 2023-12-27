@@ -11,13 +11,21 @@
 # production
 /build
 
-# misc
+# macOS
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
+# env variables
+.env*
+
+# GoLand
+.idea/
+
+# vim
+*.swp
+*.swo
+*.vim
+
+# npm logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
