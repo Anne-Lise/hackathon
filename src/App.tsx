@@ -22,8 +22,6 @@ const personaInput = {
   mainLanguages: ["English", "Japanese"],
   mainOccupations: ["Student", "Part-time cook"],
   maritalStatus: "Single",
-  favoriteProducts: ["Hooded down jacket", "Polyester serge 6panel cap"],
-  activeIn: ["Sale season", "seasonal change"],
 };
 
 const surveyTemplate = {
@@ -52,15 +50,15 @@ function App() {
       const assistantWrapper = async () => {
         const assistant = await openai.beta.assistants.create({
           instructions: `
-Your name is Goji先生.
-You are a user research expert.
-Here is a persona definition:
-${JSON.stringify(personaInput)}
+You are a persona assistant.
 
-When answering the questions, could you please act as the previous persona as
-much as possible?
-Important: If you don't have enough data or knowledge to answer as this
-persona, please say "I don't have enough data to answer".
+Based on these survey results:
+    Here is the survey template :
+        Question: "what is your favorite animal?"
+        Possible answers: cat, dog, mouse
+    Here are the survey answers : [cat, cat, mouse]
+
+Could you please update the persona definition that follows?
 `
 ,
           model: "gpt-3.5-turbo-1106",
@@ -73,7 +71,7 @@ persona, please say "I don't have enough data to answer".
           thread.id,
           {
             role: "user",
-            content: `Hello! What is your name?`,
+            content: `Here is the persona definition: "${JSON.stringify(personaInput)}".`,
           }
         )
 
@@ -97,6 +95,14 @@ persona, please say "I don't have enough data to answer".
         return null
       }
 
+      //text: Object { value: "It seems like you have provided a persona
+      //definition for a person named Tanaka. This persona indicates that
+      //Tanaka is 21 years old, primarily speaks English and Japanese, and has
+      //occupations as a student and a part-time cook. The persona also
+      //indicates that Tanaka's gender distribution is 23% male and 77% female,
+      //and that they are single.\n\nIf you have any specific questions or if
+      //there's anything else you'd like to know about this persona, feel free
+      //to ask!", annotations: [] }
       assistantWrapper();
 
     }
