@@ -50,6 +50,26 @@ function App() {
       const assistantWrapper = async () => {
         const assistant = await openai.beta.assistants.create({
           instructions: `
+Using the OpenAI API, develop an assistant tasked with updating a given persona
+based on new input data. The initial persona is defined by a set of attributes
+(e.g., age, gender, occupation), provided in a variable called
+'currentPersona'. New input data, provided in 'newInputData', may include
+additional or updated attributes. The assistant's role is to integrate
+'newInputData' into 'currentPersona'. If 'newInputData' contains fields not
+present in 'currentPersona', the assistant should add these as new categories
+to the persona. The updated persona should reflect both the original and new
+attributes, providing a comprehensive and updated profile. Example Scenario:
+The current persona, 'Tanaka', has attributes like age, gender, and occupation.
+The assistant receives 'newInputData' asking, 'What do you think about the new
+coat?' If 'newInputData' reveals an interest in fashion or specific style
+preferences not previously noted in 'Tanaka's' profile, the assistant should
+update 'Tanaka's' persona with this new category, like 'Fashion Preferences,'
+and incorporate insights from the response into this
+category.
+
+
+
+
 You are a persona assistant.
 
 Based on these survey results:
@@ -95,14 +115,6 @@ Could you please update the persona definition that follows?
         return null
       }
 
-      //text: Object { value: "It seems like you have provided a persona
-      //definition for a person named Tanaka. This persona indicates that
-      //Tanaka is 21 years old, primarily speaks English and Japanese, and has
-      //occupations as a student and a part-time cook. The persona also
-      //indicates that Tanaka's gender distribution is 23% male and 77% female,
-      //and that they are single.\n\nIf you have any specific questions or if
-      //there's anything else you'd like to know about this persona, feel free
-      //to ask!", annotations: [] }
       assistantWrapper();
 
     }
