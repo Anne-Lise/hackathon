@@ -5,15 +5,6 @@ import "./App.css";
 import OpenAI from "openai";
 import "./style.css";
 
-import {
-  ChatContainer,
-  MainContainer,
-  Message,
-  MessageInput,
-  MessageList,
-} from "@chatscope/chat-ui-kit-react";
-import { compileFunction } from "vm";
-
 const personaInput = {
   Persona: {
     personName: "Tanaka",
