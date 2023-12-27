@@ -15,21 +15,31 @@ import {
 import { compileFunction } from "vm";
 
 const personaInput = {
-  personName: "Tanaka",
-  averageAge: 21,
-  gender: { male: "23%", female: "77%" },
-  averageIncome: 100000,
-  mainLanguages: ["English", "Japanese"],
-  mainOccupations: ["Student", "Part-time cook"],
-  maritalStatus: "Single",
+  Persona: {
+    personName: "Tanaka",
+    Age: 21,
+    Gender: { male: "23%", female: "77%" },
+    Income: 100000,
+    Languages: ["English", "Japanese"],
+    Occupations: ["Student", "Part-time cook"],
+    MaritalStatus: "Single",
+  },
+  Summary: "",
 };
 
-const surveyTemplate = {
-  question: "What is your favorite color?",
-  possibleAnswers: ["Red", "Green", "Blue"],
-};
-const surveyResults = { answers: ["Red", "Red", "Blue"] };
-
+const surveyQuestion = [
+  {
+    project: "project1",
+    question: "What is your age",
+    answers: ["25", "25", "45"],
+  },
+  {
+    project: "project2",
+    question: "What is favorite language",
+    answers: ["english", "french", "japanese", "japanese"],
+  },
+];
+// const surveyAnswers1 = ["25", "25", "45"];
 
 export const openai = new OpenAI({
   apiKey: process.env.REACT_APP_OPENAI_API_KEY,
@@ -40,85 +50,95 @@ function App() {
   const [personaOutput, setPersonaOutput] = useState(
     JSON.stringify(personaInput),
   );
-  const [promptInput, setPromptInput] = useState("");
+  // const [promptInput, setPromptInput] = useState("");
   const [updatePersona, setUpdatePersona] = useState(false);
-
+  const [displayOutput, setDisplayOutput] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
   useEffect(() => {
     if (updatePersona) {
       console.log("call to openai");
-
-      const assistantWrapper = async () => {
-        const assistant = await openai.beta.assistants.create({
-          instructions: `
-Using the OpenAI API, develop an assistant tasked with updating a given persona
-based on new input data. The initial persona is defined by a set of attributes
-(e.g., age, gender, occupation), provided in a variable called
-'currentPersona'. New input data, provided in 'newInputData', may include
-additional or updated attributes. The assistant's role is to integrate
-'newInputData' into 'currentPersona'. If 'newInputData' contains fields not
-present in 'currentPersona', the assistant should add these as new categories
-to the persona. The updated persona should reflect both the original and new
-attributes, providing a comprehensive and updated profile. Example Scenario:
-The current persona, 'Tanaka', has attributes like age, gender, and occupation.
-The assistant receives 'newInputData' asking, 'What do you think about the new
-coat?' If 'newInputData' reveals an interest in fashion or specific style
-preferences not previously noted in 'Tanaka's' profile, the assistant should
-update 'Tanaka's' persona with this new category, like 'Fashion Preferences,'
-and incorporate insights from the response into this
-category.
-
-
-
-
-You are a persona assistant.
-
-Based on these survey results:
-    Here is the survey template :
-        Question: "what is your favorite animal?"
-        Possible answers: cat, dog, mouse
-    Here are the survey answers : [cat, cat, mouse]
-
-Could you please update the persona definition that follows?
-`
-,
-          model: "gpt-3.5-turbo-1106",
-        })
-
-        // Here is a persona definition: "${JSON.stringify(personaInput)}".
-        const thread = await openai.beta.threads.create()
-
-        const message = await openai.beta.threads.messages.create(
-          thread.id,
-          {
-            role: "user",
-            content: `Here is the persona definition: "${JSON.stringify(personaInput)}".`,
-          }
-        )
-
-        let run = await openai.beta.threads.runs.create(
-          thread.id,
-          {
-            assistant_id: assistant.id,
-          }
-        )
-
-        // poll run status until it is completed
-        while (run.status !== "completed") {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+      const completion = async () => {
+        const response = await openai.chat.completions.create({
+          messages: [
+            {
+              role: "system",
+              content: `Based on personaInput and surveyQuestion, in a first step, generate a average persona : Replace the existing value of the personaInput Persona field with the average value when possible. One field can have several values like occupations can be teacher and part-time job but age should be an average of all ages.
+              In a second step,if questions or answers from the surveyQuestion do not match the personaInput, summarize it in a short summary (2 sentences) explaining the main character of this average persona and add it to the Summary field of personaInput.
+              For the format, render is as follow: 
+              {Persona: {...}
+              Summary: {...}
+              }
+              Use the following variables to do step 1 and step 2 : 
+            "${JSON.stringify(personaInput)}", 
+            
+            "${JSON.stringify(surveyQuestion)}"`,
+            },
+          ],
+          // messages: [{ role: "system", content: `You are a persona assistant. Based on the question and possible answers like ${surveyTemplate}, and result answers ${surveyResults},update the persona profile ${personaInput}` }],
+          model: "gpt-3.5-turbo-0613",
+        });
+        console.log("personaOutput", response.choices[0].message.content);
+        if (response && response.choices[0].message.content) {
+          setIsUpdated(true);
+          setPersonaOutput(response.choices[0].message.content);
         }
-
-        let messages = await openai.beta.threads.messages.list(thread.id);
-        console.log(messages.data.length)
-        console.log(messages.data[0].content[0])
-
-        return null
-      }
-
-      assistantWrapper();
-
+      };
+      completion();
     }
   }, [updatePersona]);
+  //   useEffect(() => {
+  //     if (updatePersona) {
+  //       console.log("call to openai");
+  //
+  //       const assistantWrapper = async () => {
+  //         const assistant = await openai.beta.assistants.create({
+  //           instructions: `
+  //
+  //           Based on personalInput and surveyQuestion and surveyAnswers, what is the average persona ? Replace the existing personInput value with average value.
+  //
+  //
+  //
+  // `,
+  //           model: "gpt-3.5-turbo-1106",
+  //         });
+  //
+  //         // Here is a persona definition: "${JSON.stringify(personaInput)}".
+  //         const thread = await openai.beta.threads.create();
+  //
+  //         const message = await openai.beta.threads.messages.create(thread.id, {
+  //           role: "user",
+  //           content: `personaInput: "${JSON.stringify(personaInput)}"
+  //
+  //           surveyAnswers: "${JSON.stringify(surveyAnswers)}"
+  //
+  //           surveyQuestion: "${JSON.stringify(surveyQuestion)}"`,
+  //         });
+  //
+  //         let run = await openai.beta.threads.runs.create(thread.id, {
+  //           assistant_id: assistant.id,
+  //         });
+  //
+  //         // poll run status until it is completed
+  //         while (run.status !== "completed") {
+  //           await new Promise((resolve) => setTimeout(resolve, 1000));
+  //           run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+  //         }
+  //
+  //         let messages = await openai.beta.threads.messages.list(thread.id);
+  //         console.log("output", messages.data.length);
+  //         console.log(messages.data[0].content[0]);
+  //         if (messages && messages.data[0].content[0]) {
+  //           setPersonaOutput(JSON.stringify(messages.data[0].content[0]));
+  //         }
+  //         return null;
+  //       };
+  //
+  //       assistantWrapper();
+  //     }
+  //   }, [updatePersona]);
+  const personaData = JSON.parse(personaOutput);
+  const persona = personaData.Persona;
+  const summary = personaData.Summary;
 
   return (
     <div className="container">
@@ -130,15 +150,14 @@ Could you please update the persona definition that follows?
             alt="persona avatar"
           />
           <div>
-            {" "}
-            {Object.entries(JSON.parse(personaOutput)).map(([key, value]) => {
-              let displayValue: string;
+            {Object.entries(persona).map(([key, value]) => {
+              let displayValue = "";
               if (typeof value === "object" && value !== null) {
                 displayValue = Object.entries(value)
-                  .map(([innerKey, innerValue]) => `${innerValue}`)
+                  .map(([innerKey, innerValue]) => `${innerKey}: ${innerValue}`)
                   .join(", ");
               } else {
-                displayValue = value as string;
+                displayValue = String(value);
               }
               return (
                 <div key={key} className="persona-output-row">
@@ -148,31 +167,80 @@ Could you please update the persona definition that follows?
               );
             })}
           </div>
-
-          {/*<div className="survey-question">{surveyTemplate.question}</div>*/}
-          {/*<div className="survey-answers">{surveyTemplate.possibleAnswers}</div>*/}
         </div>
-        <div className="input-card">
-          <span>Here is a persona definition:</span>
-          <textarea
-            className="prompt-input"
-            value={promptInput}
-            onChange={(e) => {
-              setPromptInput(e.target.value);
-            }}
-            placeholder="continue the prompt"
-          ></textarea>
+        <div className="survey-wrapper">
+          <div className="survey-card">
+            <div>SURVEY #1 RESULTS</div>
+            <div>
+              <div className="survey-question">
+                {surveyQuestion
+                  .filter((item) => item.project === "project1")
+                  .map((item) => {
+                    const answers = item.answers
+                      .map((answer) => `<li>${answer}</li>`)
+                      .join("");
+                    return (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: `<h3>${item.question}</h3><ul>${answers}</ul>`,
+                        }}
+                      />
+                    );
+                  })}
+              </div>
+            </div>
+            <button
+              className="card-button"
+              onClick={() => {
+                console.log("here1");
+                setUpdatePersona(true);
+                setDisplayOutput(true);
+              }}
+            >
+              Check AI suggestion
+            </button>
+          </div>
+          <div className="survey-card">
+            <div>SURVEY #2 RESULTS</div>
+            <div>
+              <div className="survey-question">
+                {surveyQuestion
+                  .filter((item) => item.project === "project2")
+                  .map((item) => {
+                    const answers = item.answers
+                      .map((answer) => `<li>${answer}</li>`)
+                      .join("");
+                    return (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: `<h3>${item.question}</h3><ul>${answers}</ul>`,
+                        }}
+                      />
+                    );
+                  })}
+              </div>
+            </div>
+            <button
+              className="card-button"
+              onClick={() => {
+                console.log("here2");
+                setUpdatePersona(true);
+                setDisplayOutput(true);
+              }}
+            >
+              Check AI suggestion
+            </button>
+          </div>
+        </div>
+        <div className="output-card">
+          <div>Customized Persona</div>
+          <div>
+            {displayOutput && isUpdated && (
+              <div className="output-content-wrapper">{summary}</div>
+            )}
+          </div>
         </div>
       </div>
-      <button
-        className="update-button"
-        onClick={() => {
-          console.log("here");
-          setUpdatePersona(true);
-        }}
-      >
-        Update
-      </button>
     </div>
   );
 }

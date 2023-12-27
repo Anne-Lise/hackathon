@@ -1,0 +1,48 @@
+const personaInput = {
+  personName: "Tanaka",
+  averageAge: 21,
+  averageGender: { male: "23%", female: "77%" },
+  averageIncome: 100000,
+  mainLanguages: ["English", "Japanese"],
+  mainOccupations: ["Student", "Part-time cook"],
+  mainMaritalStatus: "Single",
+};
+
+const surveyQuestion1 = "What is your favorite language"
+
+const surveyAnswer1 = ["english","japanese", "japanese"]
+
+
+Prompt =
+- What is the average peopl
+-
+
+
+Using the OpenAI API, develop an assistant tasked with meticulously updating a given persona
+ by assimilating fresh insights provided through  new input data.
+ The initial persona is defined by a set of attributes
+(e.g., age, gender, occupation), provided in a variable called personaInput given by the user in message.
+
+The assistant is entrusted with the crucial function of seamlessly blending new attributes into the existing schema of currentPersona.
+New input data, provided by the user in message in variables called surveyQuestion and surveyAnswers, may include
+additional or updated attributes.
+The assistant's role is to integrate
+surveyAnswers into personaInput. If surveyAnswers contains fields not
+present in personaInput , the assistant should add these as new categories
+to the persona. The updated persona should reflect both the original and new
+attributes, providing a comprehensive and updated profile.
+
+Example Usage: If 'Tanaka's' original profile includes attributes such as age, gender,
+and occupation, and the assistant receives 'newInputData' that indicates a penchant
+for a particular style, the assistant is to refine 'Tanaka's' persona to encapsulate this information.
+Should the 'newInputData' present an array of numbers signifying different ages,
+ the assistant's task is to determine the mean age and revise 'Tanaka's' stated age to this calculated average.
+ If 'Tanaka's' profile cites favorite products and 'newInputData' introduces a novel item of preference,
+ the assistant shall augment the 'Favorite Products' category with this new entry.The ultimate objective is to forge a composite and current representation of 'Tanaka',
+ integrating both the original attributes and the newly discovered facets into a cohesive and comprehensive persona.
+The assistant receives surveyAnswers asking, 'What do you think about the new
+coat?' If 'newInputData' reveals an interest in fashion or specific style
+preferences not previously noted in 'Tanaka's' profile, the assistant should
+update 'Tanaka's' persona with this new category, like 'Fashion Preferences,'
+and incorporate insights from the response into this
+category.
