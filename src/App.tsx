@@ -24,7 +24,7 @@ const surveyData = [
   {
     project: "project2",
     question: "What is favorite language",
-    answers: ["english", "french", "japanese", "japanese"],
+    answers: ["English", "French", "German", "German", "French"],
   },
 ];
 
@@ -40,6 +40,7 @@ function App() {
   const [updatePersona, setUpdatePersona] = useState(false);
   const [displayOutput, setDisplayOutput] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
+  const [surveyToAnalyse, setSurveyToAnalyse] = useState({});
   useEffect(() => {
     if (updatePersona) {
       console.log("call to openai");
@@ -48,10 +49,11 @@ function App() {
           messages: [
             {
               role: "system",
-              content: `Based on variables named personaInput and surveyData, generate an updated persona :
+              content: `Based on a variable named surveyData, generate an updated persona from the one given in the variable named personaInput :
 Replace the existing value of the personaInput fields with a new value when possible.
 The new value will be computed from an analysis of surveyData.
 One field can have several values, for example "Occupations" can have "teacher" and "part-time job" as values.
+You are not allowed to change values of fields that are outside the scope of the survey question.
 
 Example:
   You have surveyData as follows: 
@@ -63,12 +65,22 @@ Example:
   As the question is about the age of the people answering, you can update the "Age" field in the persona.
   Its value could be calculated based on the average of all answers.
 
+Another example:
+  You have surveyData as follows: 
+  {
+    project: "project2",
+    question: "What is favorite language",
+    answers: ["English", "French", "German", "German", "French"],
+  }
+  As the question is about the language of the people answering, you can update the "Languages" field in the persona.
+  Its values could be the ones that are the most represented in the answers.
+
 For the format, render it as an object with the same structure as personaInput.
 
 Here are the two variables:
   personaInput: "${JSON.stringify(personaInput)}"
 
-  surveyData: "${JSON.stringify(surveyData)}"`,
+  surveyData: "${JSON.stringify(surveyToAnalyse)}"`,
             },
           ],
           model: "gpt-3.5-turbo-0613",
@@ -139,6 +151,7 @@ Here are the two variables:
                 console.log("here1");
                 setUpdatePersona(true);
                 setDisplayOutput(true);
+                setSurveyToAnalyse(surveyData[0]);
               }}
             >
               Check AI suggestion
@@ -170,6 +183,7 @@ Here are the two variables:
                 console.log("here2");
                 setUpdatePersona(true);
                 setDisplayOutput(true);
+                setSurveyToAnalyse(surveyData[1]);
               }}
             >
               Check AI suggestion
