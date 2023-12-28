@@ -60,10 +60,6 @@
     margin-top: auto;
 }
 
-.card-button:hover {
-    background-color: #45a049;
-}
-
 .input-card span {
     display: block;
     margin-bottom: 10px;

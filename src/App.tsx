@@ -23,7 +23,7 @@ const surveyData = [
   },
   {
     project: "project2",
-    question: "What is favorite language",
+    question: "What is your spoken language",
     answers: ["French", "French", "German", "German", "French"],
   },
 ];
@@ -69,7 +69,7 @@ Another example:
   You have surveyData as follows: 
   {
     project: "project2",
-    question: "What is favorite language",
+    question: "What is your spoken language",
     answers: ["French", "French", "German", "German", "French"],
   }
   As the question is about the language of the people answering, you can replace the values in the "Languages" field of the persona.
@@ -200,9 +200,9 @@ Here are the two variables:
           <div>Customized Persona</div>
           <div>
             {displayOutput && isUpdated && (
-              <pre>
+              <p style={{fontFamily: "sans-serif", whiteSpace: "pre-wrap"}}>
                 {personaOutput}
-              </pre>
+              </p>
             )}
           </div>
         </div>
