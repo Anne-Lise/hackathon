@@ -24,7 +24,7 @@ const surveyData = [
   {
     project: "project2",
     question: "What is favorite language",
-    answers: ["English", "French", "German", "German", "French"],
+    answers: ["French", "French", "German", "German", "French"],
   },
 ];
 
@@ -70,12 +70,19 @@ Another example:
   {
     project: "project2",
     question: "What is favorite language",
-    answers: ["English", "French", "German", "German", "French"],
+    answers: ["French", "French", "German", "German", "French"],
   }
-  As the question is about the language of the people answering, you can update the "Languages" field in the persona.
-  Its values could be the ones that are the most represented in the answers.
+  As the question is about the language of the people answering, you can replace the values in the "Languages" field of the persona.
+  Its values should be languages that are the most represented in the answers, ordered by the popularity of the language.
 
-For the format, render it as an object with the same structure as personaInput.
+For the format, could you give us only the outputted data, as a paragraph structured the same way as the following example:
+  Person Name: Tanaka
+  Age: 21
+  Gender: male: 23%, female: 77%
+  Income: 100000 JPY
+  Languages: 0: English, 1: Japanese
+  Occupations: 0: Student, 1: Part-time cook
+  Marital Status: Single
 
 Here are the two variables:
   personaInput: "${JSON.stringify(personaInput)}"
@@ -94,7 +101,6 @@ Here are the two variables:
       completion();
     }
   }, [updatePersona]);
-  const personaData = JSON.parse(personaOutput);
 
   return (
     <div className="container">
@@ -194,24 +200,9 @@ Here are the two variables:
           <div>Customized Persona</div>
           <div>
             {displayOutput && isUpdated && (
-              <div>
-                {Object.entries(personaData).map(([key, value]) => {
-                  let displayValue = "";
-                  if (typeof value === "object" && value !== null) {
-                    displayValue = Object.entries(value)
-                      .map(([innerKey, innerValue]) => `${innerKey}: ${innerValue}`)
-                      .join(", ");
-                  } else {
-                    displayValue = String(value);
-                  }
-                  return (
-                    <div key={key} className="persona-output-row">
-                      <strong>{key.replace(/([A-Z])/g, " $1").trim()}:</strong>{" "}
-                      {displayValue}
-                    </div>
-                  );
-                })}
-              </div>
+              <pre>
+                {personaOutput}
+              </pre>
             )}
           </div>
         </div>
